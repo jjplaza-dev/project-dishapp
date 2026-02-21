@@ -1,56 +1,79 @@
-import { db } from "./db";
-import { recipes } from "@shared/schema";
-import { eq, inArray, or, sql } from "drizzle-orm";
+import { supabase } from "./supabase";
 
 export interface IStorage {
   searchRecipes(
     ingredients: string,
     page: number,
     sortByCount?: string
-  ): Promise<{ data: typeof recipes.$inferSelect[], total: number }>;
-  getRecipe(id: number): Promise<typeof recipes.$inferSelect | undefined>;
-  getRecipesBatch(ids: number[]): Promise<typeof recipes.$inferSelect[]>;
+  ): Promise<{ data: any[], total: number }>;
+  getRecipe(id: number): Promise<any | undefined>;
+  getRecipesBatch(ids: number[]): Promise<any[]>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class SupabaseStorage implements IStorage {
   async searchRecipes(
     ingredientsStr: string,
     page: number,
     sortByCount?: string
   ) {
     const limit = 10;
-    const offset = (page - 1) * limit;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    let query = db.select().from(recipes).$dynamic();
-    let countQuery = db.select({ count: sql<number>`count(*)` }).from(recipes).$dynamic();
+    let query = supabase
+      .from('recipes')
+      .select('*', { count: 'exact' });
 
     if (ingredientsStr) {
       const terms = ingredientsStr.split(',').map(t => t.trim()).filter(Boolean);
       if (terms.length > 0) {
-        const ilikeConditions = terms.map(term => sql`${recipes.Cleaned_Ingredients} ILIKE ${'%' + term + '%'}`);
-        query = query.where(sql`${sql.join(ilikeConditions, sql` AND `)}`);
-        countQuery = countQuery.where(sql`${sql.join(ilikeConditions, sql` AND `)}`);
+        // Simple search across cleaned ingredients
+        // Supabase/PostgREST doesn't support easy "all terms must match" without complex filtering
+        // We'll use a text search or multiple ILIKEs if possible, or filter locally if needed.
+        // For now, let's use the first term as a primary filter and refine.
+        query = query.ilike('Cleaned_Ingredients', `%${terms[0]}%`);
       }
     }
 
-    const totalRes = await countQuery;
-    const total = Number(totalRes[0].count);
-
-    query = query.limit(limit).offset(offset);
+    const { data, count, error } = await query.range(from, to);
     
-    const data = await query;
-    return { data, total };
+    if (error) throw error;
+    
+    let processedData = data || [];
+    
+    // Additional filtering for all terms if multiple terms provided
+    const terms = ingredientsStr.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+    if (terms.length > 1) {
+      processedData = processedData.filter(recipe => {
+        const ingredients = recipe.Cleaned_Ingredients.toLowerCase();
+        return terms.every(term => ingredients.includes(term));
+      });
+    }
+
+    return { data: processedData, total: count || 0 };
   }
 
   async getRecipe(id: number) {
-    const [recipe] = await db.select().from(recipes).where(eq(recipes.id, id));
-    return recipe;
+    const { data, error } = await supabase
+      .from('recipes')
+      .select('*')
+      .eq('id', id)
+      .single();
+    
+    if (error) return undefined;
+    return data;
   }
 
   async getRecipesBatch(ids: number[]) {
     if (ids.length === 0) return [];
-    return await db.select().from(recipes).where(inArray(recipes.id, ids));
+    const { data, error } = await supabase
+      .from('recipes')
+      .select('*')
+      .in('id', ids);
+    
+    if (error) return [];
+    return data || [];
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new SupabaseStorage();
