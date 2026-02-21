@@ -1,38 +1,56 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import { recipes } from "@shared/schema";
+import { eq, inArray, or, sql } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  searchRecipes(
+    ingredients: string,
+    page: number,
+    sortByCount?: string
+  ): Promise<{ data: typeof recipes.$inferSelect[], total: number }>;
+  getRecipe(id: number): Promise<typeof recipes.$inferSelect | undefined>;
+  getRecipesBatch(ids: number[]): Promise<typeof recipes.$inferSelect[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+export class DatabaseStorage implements IStorage {
+  async searchRecipes(
+    ingredientsStr: string,
+    page: number,
+    sortByCount?: string
+  ) {
+    const limit = 10;
+    const offset = (page - 1) * limit;
 
-  constructor() {
-    this.users = new Map();
+    let query = db.select().from(recipes).$dynamic();
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(recipes).$dynamic();
+
+    if (ingredientsStr) {
+      const terms = ingredientsStr.split(',').map(t => t.trim()).filter(Boolean);
+      if (terms.length > 0) {
+        const ilikeConditions = terms.map(term => sql`${recipes.Cleaned_Ingredients} ILIKE ${'%' + term + '%'}`);
+        query = query.where(sql`${sql.join(ilikeConditions, sql` AND `)}`);
+        countQuery = countQuery.where(sql`${sql.join(ilikeConditions, sql` AND `)}`);
+      }
+    }
+
+    const totalRes = await countQuery;
+    const total = Number(totalRes[0].count);
+
+    query = query.limit(limit).offset(offset);
+    
+    const data = await query;
+    return { data, total };
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getRecipe(id: number) {
+    const [recipe] = await db.select().from(recipes).where(eq(recipes.id, id));
+    return recipe;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getRecipesBatch(ids: number[]) {
+    if (ids.length === 0) return [];
+    return await db.select().from(recipes).where(inArray(recipes.id, ids));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
