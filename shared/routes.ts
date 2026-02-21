@@ -23,7 +23,7 @@ export const api = {
       }).optional(),
       responses: {
         200: z.object({
-          data: z.array(z.custom<typeof recipes.$inferSelect>()),
+          data: z.array(z.any()), // Using any since schema isn't used for Supabase records directly
           total: z.number(),
           page: z.number(),
           totalPages: z.number(),
@@ -34,7 +34,7 @@ export const api = {
       method: "GET" as const,
       path: "/api/recipes/:id" as const,
       responses: {
-        200: z.custom<typeof recipes.$inferSelect>(),
+        200: z.any(),
         404: errorSchemas.notFound,
       },
     },
@@ -45,7 +45,7 @@ export const api = {
         ids: z.string().optional(), // comma-separated IDs
       }).optional(),
       responses: {
-        200: z.array(z.custom<typeof recipes.$inferSelect>()),
+        200: z.array(z.any()),
       },
     },
   },

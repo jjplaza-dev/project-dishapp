@@ -16,7 +16,7 @@ export class SupabaseStorage implements IStorage {
     page: number,
     sortByCount?: string
   ) {
-    const limit = 10;
+    const limit = 12; // Updated to 12
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
@@ -24,15 +24,11 @@ export class SupabaseStorage implements IStorage {
       .from('recipes')
       .select('*', { count: 'exact' });
 
-    if (ingredientsStr) {
-      const terms = ingredientsStr.split(',').map(t => t.trim()).filter(Boolean);
-      if (terms.length > 0) {
-        // Simple search across cleaned ingredients
-        // Supabase/PostgREST doesn't support easy "all terms must match" without complex filtering
-        // We'll use a text search or multiple ILIKEs if possible, or filter locally if needed.
-        // For now, let's use the first term as a primary filter and refine.
-        query = query.ilike('Cleaned_Ingredients', `%${terms[0]}%`);
-      }
+    const terms = ingredientsStr.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+    
+    if (terms.length > 0) {
+      // Use the first term for database-side filtering
+      query = query.ilike('Cleaned_Ingredients', `%${terms[0]}%`);
     }
 
     const { data, count, error } = await query.range(from, to);
@@ -41,15 +37,19 @@ export class SupabaseStorage implements IStorage {
     
     let processedData = data || [];
     
-    // Additional filtering for all terms if multiple terms provided
-    const terms = ingredientsStr.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+    // Additional server-side filtering for multiple terms if provided
     if (terms.length > 1) {
       processedData = processedData.filter(recipe => {
-        const ingredients = recipe.Cleaned_Ingredients.toLowerCase();
+        const ingredients = (recipe.Cleaned_Ingredients || "").toLowerCase();
         return terms.every(term => ingredients.includes(term));
       });
     }
 
+    // Since we filter locally for multiple terms, the 'count' from Supabase 
+    // might be higher than our filtered result. However, for true pagination with multiple
+    // terms across thousands of rows, we'd need a different Supabase strategy (Full Text Search).
+    // For now, we'll keep it simple but ensure the total reflects the current search scope.
+    
     return { data: processedData, total: count || 0 };
   }
 

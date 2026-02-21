@@ -24,7 +24,6 @@ export async function registerRoutes(
       if (input.sortByCount) {
         const getCount = (r: any) => {
           try {
-            // Handle both stringified arrays and actual arrays
             const ingredients = typeof r.Cleaned_Ingredients === 'string' 
               ? JSON.parse(r.Cleaned_Ingredients.replace(/'/g, '"'))
               : r.Cleaned_Ingredients;
@@ -55,7 +54,7 @@ export async function registerRoutes(
         data: processedData,
         total: total,
         page,
-        totalPages: Math.ceil(total / 10),
+        totalPages: Math.ceil(total / 12), // Updated to 12
       });
     } catch (err) {
       if (err instanceof z.ZodError) {
