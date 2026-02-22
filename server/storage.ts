@@ -16,7 +16,7 @@ export class SupabaseStorage implements IStorage {
     page: number,
     sortByCount?: string
   ) {
-    const limit = 12; // Updated to 12
+    const limit = 12;
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
@@ -27,8 +27,14 @@ export class SupabaseStorage implements IStorage {
     const terms = ingredientsStr.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
     
     if (terms.length > 0) {
-      // Use the first term for database-side filtering
-      query = query.ilike('Cleaned_Ingredients', `%${terms[0]}%`);
+      if (terms.length === 1) {
+        // Search in both Title and Ingredients for single term
+        const term = terms[0];
+        query = query.or(`Title.ilike.%${term}%,Cleaned_Ingredients.ilike.%${term}%`);
+      } else {
+        // Multi-term: use first term for database-side filter on Ingredients
+        query = query.ilike('Cleaned_Ingredients', `%${terms[0]}%`);
+      }
     }
 
     const { data, count, error } = await query.range(from, to);
@@ -37,19 +43,15 @@ export class SupabaseStorage implements IStorage {
     
     let processedData = data || [];
     
-    // Additional server-side filtering for multiple terms if provided
+    // Additional server-side filtering for multiple terms
     if (terms.length > 1) {
       processedData = processedData.filter(recipe => {
         const ingredients = (recipe.Cleaned_Ingredients || "").toLowerCase();
-        return terms.every(term => ingredients.includes(term));
+        const title = (recipe.Title || "").toLowerCase();
+        return terms.every(term => ingredients.includes(term) || title.includes(term));
       });
     }
 
-    // Since we filter locally for multiple terms, the 'count' from Supabase 
-    // might be higher than our filtered result. However, for true pagination with multiple
-    // terms across thousands of rows, we'd need a different Supabase strategy (Full Text Search).
-    // For now, we'll keep it simple but ensure the total reflects the current search scope.
-    
     return { data: processedData, total: count || 0 };
   }
 
