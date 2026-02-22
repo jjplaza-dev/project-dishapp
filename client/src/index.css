@@ -1,43 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Esteban&family=DM+Sans:opsz,wght@9..40,400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Elegant, appetizing palette */
-  --font-sans: 'DM Sans', sans-serif;
-  --font-display: 'Playfair Display', serif;
-
-  --background: 30 20% 98%; /* Warm off-white */
-  --foreground: 20 14.3% 4.1%;
+  /* Lemonade daisyUI theme colors */
+  --background: 24 33% 97%; /* #faf7f5 */
+  --foreground: 220 20% 25%; /* #333c4d */
   
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
+  --card-foreground: 220 20% 25%;
  
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 220 20% 25%;
  
-  --primary: 24 90% 55%; /* Vibrant Orange-Red */
-  --primary-foreground: 60 9.1% 97.8%;
+  --primary: 346 39% 23%; /* #51232d - deep brown */
+  --primary-foreground: 0 0% 100%;
  
-  --secondary: 30 20% 94%;
-  --secondary-foreground: 24 9.8% 10%;
+  --secondary: 52 81% 54%; /* #ead02b - yellow */
+  --secondary-foreground: 346 39% 23%;
  
-  --muted: 30 20% 94%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --muted: 24 33% 94%;
+  --muted-foreground: 220 10% 45%;
  
-  --accent: 30 20% 94%;
-  --accent-foreground: 24 9.8% 10%;
+  --accent: 12 76% 82%; /* #f3beaf - peach */
+  --accent-foreground: 346 39% 23%;
  
   --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 30 10% 88%;
-  --input: 30 10% 88%;
-  --ring: 24 90% 55%;
+  --border: 24 20% 88%;
+  --input: 24 20% 88%;
+  --ring: 346 39% 23%;
  
   --radius: 0.75rem;
+
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Esteban', serif;
 }
 
 @layer base {
@@ -48,7 +48,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h6, .font-esteban {
     font-family: var(--font-display);
   }
 }
