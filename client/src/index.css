@@ -6,34 +6,41 @@
 
 :root {
   /* Lemonade daisyUI theme colors */
-  --background: 24 33% 97%; /* #faf7f5 */
-  --foreground: 220 20% 25%; /* #333c4d */
-  
+  --background: 24 33% 97%;
+  /* #faf7f5 */
+  --foreground: 220 20% 25%;
+  /* #333c4d */
+
+
+
   --card: 0 0% 100%;
   --card-foreground: 220 20% 25%;
- 
+
   --popover: 0 0% 100%;
   --popover-foreground: 220 20% 25%;
- 
-  --primary: 346 39% 23%; /* #51232d - deep brown */
+
+  --primary: 346 39% 23%;
+  /* #51232d - deep brown */
   --primary-foreground: 0 0% 100%;
- 
-  --secondary: 52 81% 54%; /* #ead02b - yellow */
+
+  --secondary: 52 81% 54%;
+  /* #ead02b - yellow */
   --secondary-foreground: 346 39% 23%;
- 
+
   --muted: 24 33% 94%;
   --muted-foreground: 220 10% 45%;
- 
-  --accent: 12 76% 82%; /* #f3beaf - peach */
+
+  --accent: 12 76% 82%;
+  /* #f3beaf - peach */
   --accent-foreground: 346 39% 23%;
- 
+
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 100%;
 
   --border: 24 20% 88%;
   --input: 24 20% 88%;
   --ring: 346 39% 23%;
- 
+
   --radius: 0.75rem;
 
   --font-sans: 'DM Sans', sans-serif;
@@ -44,11 +51,19 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
   }
-  h1, h2, h3, h4, h5, h6, .font-esteban {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-esteban {
     font-family: var(--font-display);
   }
 }
@@ -57,17 +72,20 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-muted-foreground/20 rounded-full;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/40;
   }

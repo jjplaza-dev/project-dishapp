@@ -63,7 +63,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main ref={heroRef} className="flex-grow pt-20">
-        <div className="relative overflow-hidden bg-secondary/30 py-20 lg:py-32">
+        <div className="relative overflow-hidden bg-base-100 py-20 lg:py-32">
           {/* Decorative shapes */}
           <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 pointer-events-none" />
           <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl opacity-50 pointer-events-none" />
@@ -169,10 +169,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section
-          ref={featuresRef}
-          className="py-24 bg-muted/30 border-y border-border/50"
-        >
+        <section ref={featuresRef} className="py-24 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
@@ -214,8 +211,11 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section ref={ctaRef} className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-primary/5 -skew-y-3 scale-110" />
+        <section
+          ref={ctaRef}
+          className="py-24 relative bg-muted/30 overflow-hidden"
+        >
+          <div className="absolute inset-0 scale-110 z-10" />
           <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
             <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
               Ready to create something delicious?
