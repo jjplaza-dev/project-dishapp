@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 import { z } from "zod";
 
-// Helper for constructing query string for array of inputs if needed, 
+// Helper for constructing query string for array of inputs if needed,
 // though the schema defines it as a single string for batch IDs or ingredients
 // We will adapt our hook arguments to match the schema expectations.
 
-export function useSearchRecipes(params: { 
-  ingredients?: string; 
-  page?: number; 
-  sortByCount?: "low-to-high" | "high-to-low" | "2-5" | "5-10" 
+export function useSearchRecipes(params: {
+  ingredients?: string;
+  page?: number;
+  sortByCount?: "low-to-high" | "high-to-low" | "2-5" | "5-10";
 }) {
   const queryParams = new URLSearchParams();
   if (params.ingredients) queryParams.append("ingredients", params.ingredients);
@@ -48,10 +48,10 @@ export function useBatchRecipes(ids: number[]) {
     queryKey: [api.recipes.getBatch.path, ids],
     queryFn: async () => {
       if (ids.length === 0) return [];
-      
+
       const params = new URLSearchParams();
       params.append("ids", ids.join(","));
-      
+
       const url = `${api.recipes.getBatch.path}?${params.toString()}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch batch recipes");

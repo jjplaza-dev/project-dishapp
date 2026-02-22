@@ -15,26 +15,26 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
   // Parse ingredients length for a quick stat
   // Parse ingredients length safely for a quick stat
+  // Fast, bulletproof way to get the count without JSON parsing
   let ingredientCount = 0;
-  if (recipe.Ingredients) {
-    try {
-      // Step 1: Replace ONLY structural quotes, preserving natural apostrophes
-      const jsonFriendlyString = recipe.Ingredients.replace(/^\['/, '["') // Replace opening [' with ["
-        .replace(/'\]$/, '"]') // Replace closing '] with "]
-        .replace(/', '/g, '", "'); // Replace middle ', ' with ", "
-
-      // Step 2: Parse and get length
-      ingredientCount = JSON.parse(jsonFriendlyString).length;
-    } catch (err) {
-      console.error("Error parsing ingredients for recipe id:", recipe.id, err);
-      // ingredientCount remains 0 as a safe fallback
+  if (
+    recipe.Ingredients &&
+    recipe.Ingredients !== "[]" &&
+    recipe.Ingredients !== ""
+  ) {
+    // If it's a standard Python string list, count the separators + 1
+    if (recipe.Ingredients.includes("', '")) {
+      ingredientCount = recipe.Ingredients.split("', '").length;
+    } else {
+      // If there are no separators but it's not empty, it's 1 ingredient
+      ingredientCount = 1;
     }
   }
 
   // Construct image URL - Assuming user provided format
   const imageUrl = imgError
     ? "https://images.unsplash.com/photo-1495521821758-e1d4d762143b?q=80&w=1000&auto=format&fit=crop" // Fallback: Appetizing food spread
-    : `https://your-hostinger-domain.com/recipe-images/${recipe.Image_Name}.jpg`;
+    : `https://hotpink-sardine-441042.hostingersite.com/recipe-images/${recipe.Image_Name}.jpg`;
 
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/20 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col">
