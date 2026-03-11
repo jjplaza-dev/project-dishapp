@@ -13,6 +13,9 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function Home() {
   const [ingredients, setIngredients] = useState("");
@@ -26,12 +29,11 @@ export default function Home() {
     const ctx = gsap.context(() => {
       // Hero Animation
       gsap.from(".hero-content > *", {
-        y: 30,
+        y: 100,
         opacity: 0,
         duration: 1,
-        stagger: 0.15,
-        ease: "power3.out",
-        delay: 0.2,
+        stagger: 0.2,
+        ease: "power2.out",
       });
 
       // Features Animation
@@ -56,6 +58,58 @@ export default function Home() {
       setLocation(`/search?ingredients=${encodeURIComponent(ingredients)}`);
     }
   };
+  
+
+  const elementRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      
+      gsap.to(elementRef.current, {
+        height: "90vh",
+        width: "90%",
+        borderRadius: "10px", 
+        ease: "none",
+        scrollTrigger: {
+          trigger: elementRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.from(".step-image", {
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power2.out",
+      })
+      .from(".step-text", {
+        y: "100%",
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power3.out",
+      }, "-=0.6");
+
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans">
@@ -63,8 +117,8 @@ export default function Home() {
 
       {/* Hero Section */}
       <main ref={heroRef} className="flex-grow pt-20">
-        <div className="relative overflow-hidden bg-base-100 py-20 lg:py-32">
-          {/* Decorative shapes */}
+        <div ref={elementRef} className="w-[100%] h-screen m-auto relative overflow-hidden bg-base-100 py-20 lg:py-32" style={{backgroundImage: `url("../assets/choppingboard1.jpg")`, backgroundPosition: "center"}}>
+ 
           <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 pointer-events-none" />
           <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl opacity-50 pointer-events-none" />
 
@@ -74,14 +128,14 @@ export default function Home() {
               Discover delicious recipes instantly
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-display font-bold text-foreground mb-6 leading-[1.1]">
+            <h1 className="bodoni italic text-5xl md:text-7xl font-display font-bold text-foreground mb-6 leading-[1.1]">
               Cook with what <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-600">
                 you have today.
               </span>
             </h1>
 
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="lato text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
               Enter the ingredients in your pantry, and we'll show you the magic
               you can create. No waste, just taste.
             </p>
@@ -136,40 +190,52 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-              {[
-                {
-                  step: "01",
-                  title: "Check Your Pantry",
-                  desc: "Look around and see what ingredients you currently have available.",
-                },
-                {
-                  step: "02",
-                  title: "Enter Ingredients",
-                  desc: "Type them into our search bar above. Separate multiple items with commas.",
-                },
-                {
-                  step: "03",
-                  title: "Get Cooking",
-                  desc: "Browse tailored recipes, follow the steps, and enjoy your homemade dish.",
-                },
-              ].map((item, idx) => (
-                <div key={idx} className="relative group">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+      {[
+        {
+          step: "01",
+          title: "Check Your Pantry",
+          image: "../assets/pantry.png",
+          desc: "Look around and see what ingredients you currently have available.",
+        },
+        {
+          step: "02",
+          title: "Enter Ingredients",
+          image: "../assets/ingredientslist.png",
+          desc: "Type them into our search bar above. Separate multiple items with commas.",
+        },
+        {
+          step: "03",
+          title: "Get Cooking",
+          image: "../assets/cooking.png",
+          desc: "Browse tailored recipes, follow the steps, and enjoy your homemade dish.",
+        },
+      ].map((item, idx) => (
+        <div key={idx} className="relative group">
+          
+          <div className="step-image w-[80%] aspect-video bg-none rounded-lg flex items-center justify-center text-primary font-bold text-xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+            <img className="w-full h-full object-cover" alt={item.title} src={item.image} />
+          </div>
+
+          <div className="overflow-hidden mb-3">
+            <h3 className="step-text text-xl lato font-bold">
+              {item.title}
+            </h3>
+          </div>
+
+          <div className="overflow-hidden">
+            <p className="step-text text-muted-foreground leading-relaxed">
+              {item.desc}
+            </p>
+          </div>
+
+        </div>
+      ))}
+    </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section ref={featuresRef} className="py-24 bg-muted/30">
+        <section ref={featuresRef} className="py-24 bg-base-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
@@ -213,7 +279,7 @@ export default function Home() {
         {/* CTA Section */}
         <section
           ref={ctaRef}
-          className="py-24 relative bg-muted/30 overflow-hidden"
+          className="py-24 relative bg-base-100 overflow-hidden"
         >
           <div className="absolute inset-0 scale-110 z-10" />
           <div className="max-w-4xl mx-auto px-4 text-center relative z-10">

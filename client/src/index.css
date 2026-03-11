@@ -6,12 +6,11 @@
 
 :root {
   /* Lemonade daisyUI theme colors */
-  --background: 24 33% 97%;
+  --background: #EED9B9;
+  
   /* #faf7f5 */
   --foreground: 220 20% 25%;
   /* #333c4d */
-
-
 
   --card: 0 0% 100%;
   --card-foreground: 220 20% 25%;
@@ -66,6 +65,16 @@
   .font-esteban {
     font-family: var(--font-display);
   }
+}
+
+
+.bodoni{
+  font-family: "Libre Bodoni", serif;
+  font-optical-sizing: auto;
+}
+.lato {
+  font-family: "Lato", sans-serif;
+  font-optical-sizing: auto;
 }
 
 @layer utilities {

@@ -13,7 +13,6 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   const favorited = isFavorite(recipe.id);
   const [imgError, setImgError] = useState(false);
 
-  // Parse ingredients length for a quick stat
   // Parse ingredients length safely for a quick stat
   // Fast, bulletproof way to get the count without JSON parsing
   let ingredientCount = 0;
@@ -31,10 +30,10 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     }
   }
 
-  // Construct image URL - Assuming user provided format
-  const imageUrl = imgError
-    ? "https://images.unsplash.com/photo-1495521821758-e1d4d762143b?q=80&w=1000&auto=format&fit=crop" // Fallback: Appetizing food spread
-    : `https://hotpink-sardine-441042.hostingersite.com/recipe-images/${recipe.Image_Name}.jpg`;
+  // --- CHANGED THIS SECTION ---
+  // Construct image URL using Supabase public storage endpoint
+  const imageUrl = `https://qidzadjpzgycrxuolkia.supabase.co/storage/v1/object/public/recipe-images/${recipe.Image_Name}.jpg`;
+  // ----------------------------
 
   return (
     <div className="group relative bg-card rounded-2xl overflow-hidden border border-border/50 hover:border-primary/20 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col">

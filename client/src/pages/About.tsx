@@ -25,7 +25,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
             <div>
               <img 
-                src="https://pixabay.com/get/g547622be4412ccf20c18937484c56c2eb14252fc7ef2be922047b317b46c8d7927ed56147c3543494ab7273ba8b9a8b34889dbefe1e654f07c8aa72164ccedbb_1280.jpg" 
+                src="../assets/aboutfood.jpg" 
                 alt="Cooking together" 
                 className="rounded-3xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500"
               />

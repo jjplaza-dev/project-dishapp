@@ -98,9 +98,7 @@ export default function RecipeDetail() {
     (line) => line.trim().length > 0,
   );
 
-  const imageUrl = imgError
-    ? "https://images.unsplash.com/photo-1495521821758-e1d4d762143b?q=80&w=1000&auto=format&fit=crop"
-    : `https://hotpink-sardine-441042.hostingersite.com/recipe-images/${recipe.Image_Name}.jpg`;
+  const imageUrl = `https://qidzadjpzgycrxuolkia.supabase.co/storage/v1/object/public/recipe-images/${recipe.Image_Name}.jpg`;
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans">
